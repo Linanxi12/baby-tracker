@@ -2,7 +2,7 @@
   "name": "宝宝成长记录",
   "short_name": "宝宝记录",
   "description": "新生儿日常记录工具 - 喂养、排泄、睡眠、生长全记录",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FFF9F5",
