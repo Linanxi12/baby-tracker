@@ -48,11 +48,9 @@ body {
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
-  min-height: 100dvh;
   position: relative;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
-  overscroll-behavior: none;
   user-select: none;
 }
 
@@ -63,7 +61,6 @@ body {
   z-index: 100;
   background: var(--bg);
   padding: 12px 20px;
-  padding-top: max(12px, env(safe-area-inset-top));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -244,7 +241,7 @@ body {
   padding: 10px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 16px;
+  font-size: 15px;
   background: var(--bg);
   color: var(--text);
   font-family: inherit;
@@ -347,15 +344,13 @@ body {
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
   background: var(--card);
   border-top: 1px solid var(--border);
   display: flex;
-  padding: 6px 0 constant(safe-area-inset-bottom, 8px);
   padding: 6px 0 env(safe-area-inset-bottom, 8px);
   z-index: 100;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
@@ -395,11 +390,8 @@ body {
   width: 100%;
   max-width: 480px;
   max-height: 85vh;
-  max-height: 85dvh;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 20px;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom));
   animation: slideUp 0.25s;
 }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -463,15 +455,11 @@ body {
   border-radius: 10px;
   padding: 3px;
   margin-bottom: 16px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  flex-wrap: nowrap;
 }
 .tab-item {
-  flex: 0 0 auto;
+  flex: 1;
   text-align: center;
-  padding: 8px 12px;
+  padding: 8px;
   border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
@@ -547,11 +535,6 @@ body {
   transition: border-color 0.15s;
 }
 .color-dot.selected { border-color: var(--text); }
-.selected-emoji { background: var(--primary-light); border-radius: 8px; }
-
-/* Touch manipulation for iOS tap response */
-.btn, .nav-item, .quick-action, .icon-btn, .tab-item { touch-action: manipulation; }
-
 
 /* Responsive / scrollbar */
 ::-webkit-scrollbar { width: 0; }
@@ -1185,22 +1168,9 @@ function updateFeedCountdown() {
 function openModal(html) {
   document.getElementById('modalSheet').innerHTML = html;
   document.getElementById('modalOverlay').style.display = 'flex';
-  // Lock background scrolling on iOS by fixing body position
-  document.body.dataset.scrollY = window.scrollY;
-  document.body.style.position = 'fixed';
-  document.body.style.top = '-' + window.scrollY + 'px';
-  document.body.style.width = '100%';
-  document.body.style.overflow = 'hidden';
 }
 function closeModal() {
   document.getElementById('modalOverlay').style.display = 'none';
-  // Restore background scrolling and scroll position
-  const scrollY = Math.abs(parseInt(document.body.style.top || '0'));
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  document.body.style.overflow = '';
-  window.scrollTo(0, scrollY);
   if (feedTimer) {
     stopFeedTimer();
   }
