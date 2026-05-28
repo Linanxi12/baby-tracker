@@ -1,0 +1,9 @@
+{
+  "appId": "com.baby.tracker",
+  "appName": "宝宝成长记录",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true
+  }
+}
