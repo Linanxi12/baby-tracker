@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUID Generator — Generate Random UUID v4 Online | DevBox</title>
+  <meta name="description" content="Free online UUID v4 generator. Generate cryptographically random UUIDs in bulk. No server calls — all generation happens locally in your browser.">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">UUID Generator</h1>
+        <p class="page-desc">Generate cryptographically random UUID v4 identifiers. All generation happens locally in your browser.</p>
+      </div>
+
+      <div class="flex-between" style="align-items:end;margin-bottom:12px;">
+        <div>
+          <label for="count">Number of UUIDs</label>
+          <input type="number" id="count" value="1" min="1" max="100" style="width:100px;">
+        </div>
+        <button class="btn btn-primary" onclick="generate()">Generate</button>
+      </div>
+
+      <div>
+        <label>Format</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;margin-right:16px;font-size:0.84rem;color:var(--text);">
+          <input type="radio" name="format" value="plain" checked onchange="generate()"> Plain
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:4px;margin-right:16px;font-size:0.84rem;color:var(--text);">
+          <input type="radio" name="format" value="uppercase" onchange="generate()"> Uppercase
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.84rem;color:var(--text);">
+          <input type="radio" name="format" value="nohyphens" onchange="generate()"> No Hyphens
+        </label>
+      </div>
+
+      <div class="mt-12 flex-between">
+        <label style="margin:0">Output</label>
+        <button class="btn btn-sm btn-secondary" onclick="copyOutput()">Copy All</button>
+      </div>
+      <div id="output" class="result-area" style="min-height:80px;max-height:400px;overflow:auto;"></div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="password-generator.html">Password Generator</a>
+        <a href="base64.html">Base64 Encoder</a>
+        <a href="json-formatter.html">JSON Formatter</a>
+        <a href="timestamp.html">Timestamp Converter</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const countInput = document.getElementById('count');
+    const toast = document.getElementById('toast');
+
+    function generate() {
+      const count = Math.min(Math.max(parseInt(countInput.value) || 1, 1), 100);
+      countInput.value = count;
+
+      let format = 'plain';
+      const el = document.querySelector('input[name="format"]:checked');
+      if (el) format = el.value;
+
+      const uuids = [];
+      for (let i = 0; i < count; i++) {
+        let uuid = crypto.randomUUID();
+        if (format === 'uppercase') uuid = uuid.toUpperCase();
+        if (format === 'nohyphens') uuid = uuid.replace(/-/g, '');
+        uuids.push(uuid);
+      }
+      output.textContent = uuids.join('\n');
+    }
+
+    function copyOutput() {
+      if (!output.textContent) return;
+      navigator.clipboard.writeText(output.textContent);
+      toast.textContent = 'Copied!'; toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    generate();
+  </script>
+</body>
+</html>

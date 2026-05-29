@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter — Beautify, Validate & Minify JSON Online | DevBox</title>
+  <meta name="description" content="Free online JSON formatter, validator, and minifier. Format messy JSON, validate syntax, and compress JSON — all in your browser. No data sent to any server.">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">{ } JSON Formatter</h1>
+        <p class="page-desc">Format, validate, and minify JSON. Everything runs in your browser — your data stays private.</p>
+      </div>
+
+      <label>Input</label>
+      <textarea id="input" placeholder='Paste your JSON here... e.g. {"name":"John","age":30}'></textarea>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="formatJSON()">Format / Beautify</button>
+        <button class="btn btn-secondary" onclick="minifyJSON()">Minify / Compress</button>
+        <button class="btn btn-secondary" onclick="validateJSON()">Validate</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div id="error" class="error-msg" style="display:none"></div>
+
+      <div class="mt-16 flex-between">
+        <label style="margin:0">Output</label>
+        <button class="btn btn-sm btn-secondary" onclick="copyOutput()">Copy</button>
+      </div>
+      <div id="output" class="result-area" style="min-height:200px;max-height:500px;overflow:auto;"></div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="base64.html">Base64 Encoder</a>
+        <a href="url-encoder.html">URL Encoder</a>
+        <a href="regex-tester.html">Regex Tester</a>
+        <a href="diff-checker.html">Diff Checker</a>
+        <a href="markdown-preview.html">Markdown Preview</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const errorEl = document.getElementById('error');
+    const toast = document.getElementById('toast');
+
+    function formatJSON() {
+      errorEl.style.display = 'none';
+      try { output.textContent = JSON.stringify(JSON.parse(input.value), null, 2); }
+      catch(e) { errorEl.style.display = 'block'; errorEl.textContent = 'Invalid JSON: ' + e.message; }
+    }
+
+    function minifyJSON() {
+      errorEl.style.display = 'none';
+      try { output.textContent = JSON.stringify(JSON.parse(input.value)); }
+      catch(e) { errorEl.style.display = 'block'; errorEl.textContent = 'Invalid JSON: ' + e.message; }
+    }
+
+    function validateJSON() {
+      try { JSON.parse(input.value); errorEl.style.display = 'block'; errorEl.style.color = 'var(--accent)'; errorEl.textContent = '✓ Valid JSON'; }
+      catch(e) { errorEl.style.display = 'block'; errorEl.style.color = 'var(--danger)'; errorEl.textContent = '✗ Invalid JSON: ' + e.message; }
+    }
+
+    function clearAll() { input.value = ''; output.textContent = ''; errorEl.style.display = 'none'; }
+
+    function copyOutput() {
+      if (!output.textContent) return;
+      navigator.clipboard.writeText(output.textContent);
+      toast.textContent = 'Copied!'; toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    // Sample data
+    input.value = '{"users":[{"name":"Alice","age":28,"skills":["JS","Python"]},{"name":"Bob","age":32,"skills":["Go","Rust"]}],"active":true}';
+    formatJSON();
+  </script>
+</body>
+</html>

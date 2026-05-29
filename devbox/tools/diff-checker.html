@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Diff Checker — Compare Text Online | DevBox</title>
+  <meta name="description" content="Free online text diff checker. Compare two texts side by side and find every difference. Works entirely in your browser — your data stays private.">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .diff-add { background: rgba(78,201,176,0.15); color: var(--accent); }
+    .diff-remove { background: rgba(224,108,117,0.15); color: var(--danger); text-decoration: line-through; }
+    #diff-output { background: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; font-family: var(--font-mono); font-size: 0.86rem; line-height: 1.6; min-height: 120px; max-height: 400px; overflow: auto; white-space: pre-wrap; word-break: break-all; color: var(--text-bright); }
+    .diff-line-num { color: #666; user-select: none; margin-right: 12px; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">Text Diff Checker</h1>
+        <p class="page-desc">Compare two texts line by line and find insertions, deletions, and unchanged lines. Everything runs client-side.</p>
+      </div>
+
+      <div class="tool-col-half">
+        <div>
+          <label for="text-a">Original Text</label>
+          <textarea id="text-a" placeholder="Paste original text here..."></textarea>
+        </div>
+        <div>
+          <label for="text-b">Modified Text</label>
+          <textarea id="text-b" placeholder="Paste modified text here..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="runDiff()">Compare</button>
+        <button class="btn btn-secondary" onclick="swapTexts()">Swap</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div class="mt-16">
+        <label>Differences</label>
+        <div id="diff-output"></div>
+        <div id="diff-summary" class="text-sm mt-12"></div>
+      </div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="regex-tester.html">Regex Tester</a>
+        <a href="json-formatter.html">JSON Formatter</a>
+        <a href="markdown-preview.html">Markdown Preview</a>
+        <a href="base64.html">Base64 Encoder</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <script>
+    const textA = document.getElementById('text-a');
+    const textB = document.getElementById('text-b');
+    const diffOut = document.getElementById('diff-output');
+    const diffSummary = document.getElementById('diff-summary');
+
+    // Simple LCS-based line diff
+    function lcsTable(a, b) {
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => new Uint16Array(n + 1));
+      for (let i = 1; i <= m; i++)
+        for (let j = 1; j <= n; j++)
+          dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
+      return dp;
+    }
+
+    function backtrack(a, b, dp) {
+      const result = [];
+      let i = a.length, j = b.length;
+      while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && a[i - 1] === b[j - 1]) {
+          result.unshift({ type: 'same', line: a[i - 1] });
+          i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+          result.unshift({ type: 'add', line: b[j - 1] });
+          j--;
+        } else {
+          result.unshift({ type: 'remove', line: a[i - 1] });
+          i--;
+        }
+      }
+      return result;
+    }
+
+    function runDiff() {
+      const linesA = textA.value.split('\n');
+      const linesB = textB.value.split('\n');
+      const dp = lcsTable(linesA, linesB);
+      const diff = backtrack(linesA, linesB, dp);
+
+      let html = '';
+      let adds = 0, removes = 0;
+      let lineA = 0, lineB = 0;
+
+      for (const d of diff) {
+        if (d.type === 'same') {
+          lineA++; lineB++;
+          html += '<span class="diff-line-num">' + String(lineA).padStart(3) + ' ' + String(lineB).padStart(3) + '</span>' + esc(d.line) + '\n';
+        } else if (d.type === 'add') {
+          lineB++; adds++;
+          html += '<span class="diff-add"><span class="diff-line-num">   +' + String(lineB).padStart(3) + '</span>+ ' + esc(d.line) + '</span>\n';
+        } else {
+          lineA++; removes++;
+          html += '<span class="diff-remove"><span class="diff-line-num">' + String(lineA).padStart(3) + ' -  </span>- ' + esc(d.line) + '</span>\n';
+        }
+      }
+
+      diffOut.innerHTML = html || 'No differences found.';
+      diffSummary.innerHTML =
+        '<span style="color:var(--accent)">+' + adds + ' added</span>, ' +
+        '<span style="color:var(--danger)">-' + removes + ' removed</span>, ' +
+        '<span style="color:#888">' + (diff.length - adds - removes) + ' unchanged</span>';
+    }
+
+    function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function swapTexts() {
+      const tmp = textA.value;
+      textA.value = textB.value;
+      textB.value = tmp;
+      runDiff();
+    }
+
+    function clearAll() { textA.value = ''; textB.value = ''; diffOut.innerHTML = ''; diffSummary.innerHTML = ''; }
+
+    // Sample
+    textA.value = 'function hello() {\n  console.log("Hello");\n  return true;\n}\n\nconst x = 42;';
+    textB.value = 'function hello() {\n  console.log("Hello World");\n  return true;\n}\n\nconst x = 42;\nconst y = 99;';
+    runDiff();
+  </script>
+</body>
+</html>

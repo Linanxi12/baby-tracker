@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Encoder & Decoder — Encode URLs Online | DevBox</title>
+  <meta name="description" content="Free online URL encoder and decoder. Convert special characters to URL-safe format and decode URLs back to readable text. Works entirely in your browser.">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">URL Encoder / Decoder</h1>
+        <p class="page-desc">Encode URLs for safe transmission or decode them back to readable text. Choose between encodeURIComponent (full) and encodeURI (path-safe).</p>
+      </div>
+
+      <label for="input">Input</label>
+      <textarea id="input" placeholder="Enter text or URL to encode/decode..."></textarea>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="doEncode()">Encode</button>
+        <button class="btn btn-primary" onclick="doEncodeComponent()">Encode Component (Full)</button>
+        <button class="btn btn-secondary" onclick="doDecode()">Decode</button>
+        <button class="btn btn-secondary" onclick="swap()">Swap</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div id="error" class="error-msg" style="display:none"></div>
+
+      <div class="mt-16 flex-between">
+        <label style="margin:0">Output</label>
+        <button class="btn btn-sm btn-secondary" onclick="copyOutput()">Copy</button>
+      </div>
+      <div id="output" class="result-area" style="min-height:100px;max-height:400px;overflow:auto;"></div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="base64.html">Base64 Encoder</a>
+        <a href="json-formatter.html">JSON Formatter</a>
+        <a href="regex-tester.html">Regex Tester</a>
+        <a href="diff-checker.html">Diff Checker</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const errorEl = document.getElementById('error');
+    const toast = document.getElementById('toast');
+
+    function doEncode() {
+      errorEl.style.display = 'none';
+      try { output.textContent = encodeURI(input.value); }
+      catch(e) { errorEl.style.display = 'block'; errorEl.textContent = e.message; }
+    }
+
+    function doEncodeComponent() {
+      errorEl.style.display = 'none';
+      try { output.textContent = encodeURIComponent(input.value); }
+      catch(e) { errorEl.style.display = 'block'; errorEl.textContent = e.message; }
+    }
+
+    function doDecode() {
+      errorEl.style.display = 'none';
+      try { output.textContent = decodeURIComponent(input.value); }
+      catch(e) { errorEl.style.display = 'block'; errorEl.textContent = 'Decode error: ' + e.message; }
+    }
+
+    function swap() {
+      const tmp = input.value;
+      input.value = output.textContent;
+      output.textContent = tmp;
+      errorEl.style.display = 'none';
+    }
+
+    function clearAll() { input.value = ''; output.textContent = ''; errorEl.style.display = 'none'; }
+
+    function copyOutput() {
+      if (!output.textContent) return;
+      navigator.clipboard.writeText(output.textContent);
+      toast.textContent = 'Copied!'; toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+  </script>
+</body>
+</html>

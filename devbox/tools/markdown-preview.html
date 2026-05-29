@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Preview — Write & Preview Markdown Online | DevBox</title>
+  <meta name="description" content="Free online Markdown editor and previewer. Write Markdown on the left, see rendered HTML on the right. Works entirely in your browser — no data leaves your device.">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    #preview { background: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; min-height: 200px; max-height: 500px; overflow: auto; font-family: var(--font-sans); line-height: 1.7; color: var(--text-bright); }
+    #preview h1, #preview h2, #preview h3 { color: var(--accent); margin: 16px 0 8px; }
+    #preview h1 { font-size: 1.4rem; }
+    #preview h2 { font-size: 1.15rem; }
+    #preview h3 { font-size: 1rem; }
+    #preview code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.84rem; }
+    #preview pre { background: rgba(0,0,0,0.3); padding: 12px; border-radius: var(--radius); overflow-x: auto; margin: 8px 0; }
+    #preview pre code { background: none; padding: 0; }
+    #preview blockquote { border-left: 3px solid var(--accent); padding-left: 12px; color: #999; margin: 8px 0; }
+    #preview table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+    #preview th, #preview td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+    #preview th { background: rgba(255,255,255,0.05); }
+    #preview a { color: var(--accent); }
+    #preview img { max-width: 100%; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">Markdown Preview</h1>
+        <p class="page-desc">Write Markdown and preview the rendered HTML in real time. All rendering happens locally — your content stays private.</p>
+      </div>
+
+      <div class="tool-col-half">
+        <div>
+          <label for="input">Markdown Editor</label>
+          <textarea id="input" placeholder="Type your Markdown here..." style="min-height:350px;"></textarea>
+        </div>
+        <div>
+          <label>Preview</label>
+          <div id="preview"></div>
+        </div>
+      </div>
+
+      <div class="btn-group mt-12">
+        <button class="btn btn-sm btn-secondary" onclick="copyHTML()">Copy HTML</button>
+        <button class="btn btn-sm btn-secondary" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="diff-checker.html">Diff Checker</a>
+        <a href="json-formatter.html">JSON Formatter</a>
+        <a href="regex-tester.html">Regex Tester</a>
+        <a href="color-converter.html">Color Converter</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const input = document.getElementById('input');
+    const preview = document.getElementById('preview');
+    const toast = document.getElementById('toast');
+
+    function render() {
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
+        preview.innerHTML = marked.parse(input.value || '');
+      } else {
+        preview.innerHTML = '<span style="color:var(--danger)">Markdown parser loading... If this persists, check your connection.</span>';
+      }
+    }
+
+    input.addEventListener('input', render);
+
+    function copyHTML() {
+      if (!preview.innerHTML) return;
+      navigator.clipboard.writeText(preview.innerHTML);
+      toast.textContent = 'HTML Copied!'; toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    function clearAll() { input.value = ''; preview.innerHTML = ''; }
+
+    // Sample
+    input.value = '# Welcome to Markdown\n\nWrite **Markdown** on the left and see the *rendered* HTML here.\n\n## Features\n\n- Real-time preview\n- GitHub Flavored Markdown\n- Works offline (after CDN loads)\n\n```js\nconsole.log("Hello, DevBox!");\n```\n\n> Everything stays in your browser.';
+    render();
+  </script>
+</body>
+</html>

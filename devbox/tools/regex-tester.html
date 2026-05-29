@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regex Tester — Test Regular Expressions Online | DevBox</title>
+  <meta name="description" content="Free online regex tester. Test JavaScript regular expressions with real-time match highlighting, groups capture, and flags. Works entirely in your browser.">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>.match { background: rgba(78,201,176,0.35); color: #e0e0e0; border-radius: 2px; }
+    .group { background: rgba(220,220,170,0.3); border: 1px dashed var(--warning); border-radius: 2px; }
+    pre#highlight-area { white-space: pre-wrap; word-break: break-all; padding: 12px; background: var(--bg-light); border: 1px solid var(--border); border-radius: var(--radius); min-height: 60px; max-height: 300px; overflow: auto; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.5; color: var(--text-bright); }</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">Regex Tester</h1>
+        <p class="page-desc">Test JavaScript regular expressions in real time. See matches highlighted as you type.</p>
+      </div>
+
+      <label for="pattern">Pattern</label>
+      <div class="tool-row">
+        <input type="text" id="pattern" placeholder="e.g. (\w+)@(\w+\.\w+)" style="flex:3;">
+        <input type="text" id="flags" placeholder="Flags: g i m s" style="flex:0.5;min-width:90px;">
+      </div>
+
+      <label class="mt-12" for="test-string">Test String</label>
+      <textarea id="test-string" placeholder="Enter text to test against your regex pattern..."></textarea>
+
+      <div class="mt-12 flex-between">
+        <label style="margin:0">Match Result</label>
+        <span id="match-count" class="text-sm"></span>
+      </div>
+      <pre id="highlight-area"></pre>
+
+      <div class="mt-12">
+        <label>Match Groups</label>
+        <div id="groups" class="result-area" style="min-height:30px;">—</div>
+      </div>
+
+      <div id="error" class="error-msg" style="display:none"></div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="diff-checker.html">Diff Checker</a>
+        <a href="json-formatter.html">JSON Formatter</a>
+        <a href="url-encoder.html">URL Encoder</a>
+        <a href="base64.html">Base64 Encoder</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <script>
+    const patternEl = document.getElementById('pattern');
+    const flagsEl = document.getElementById('flags');
+    const testStr = document.getElementById('test-string');
+    const highlight = document.getElementById('highlight-area');
+    const groupsEl = document.getElementById('groups');
+    const matchCount = document.getElementById('match-count');
+    const errorEl = document.getElementById('error');
+
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function runRegex() {
+      errorEl.style.display = 'none';
+      const text = testStr.value;
+      highlight.textContent = text;
+      groupsEl.textContent = '—';
+      matchCount.textContent = '';
+      if (!patternEl.value) return;
+
+      try {
+        const re = new RegExp(patternEl.value, flagsEl.value);
+        let html = escapeHtml(text);
+
+        // Find all matches
+        const matches = [];
+        let m;
+        if (re.global || re.sticky) {
+          while ((m = re.exec(text)) !== null) {
+            matches.push({ index: m.index, text: m[0], groups: m.slice(1) });
+            if (m[0].length === 0) { re.lastIndex++; if (re.lastIndex > text.length) break; }
+          }
+        } else {
+          m = re.exec(text);
+          if (m) matches.push({ index: m.index, text: m[0], groups: m.slice(1) });
+        }
+
+        // Highlight (from end to start to preserve indices)
+        for (let i = matches.length - 1; i >= 0; i--) {
+          const { index, text: t } = matches[i];
+          const escaped = escapeHtml(t);
+          html = html.slice(0, index) + '<span class="match">' + escaped + '</span>' + html.slice(index + t.length);
+        }
+
+        highlight.innerHTML = html || escapeHtml(text);
+        matchCount.textContent = matches.length + ' match' + (matches.length !== 1 ? 'es' : '');
+
+        // Show groups for last match
+        if (matches.length > 0) {
+          const last = matches[matches.length - 1];
+          if (last.groups.length > 0) {
+            groupsEl.innerHTML = last.groups.map((g, i) => 'Group ' + (i+1) + ': <span style="color:var(--accent)">' + escapeHtml(g || '(empty)') + '</span>').join('<br>');
+          } else {
+            groupsEl.textContent = 'No capture groups in pattern';
+          }
+        }
+      } catch(e) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Regex Error: ' + e.message;
+      }
+    }
+
+    patternEl.addEventListener('input', runRegex);
+    flagsEl.addEventListener('input', runRegex);
+    testStr.addEventListener('input', runRegex);
+
+    // Init sample
+    patternEl.value = '(\\w+)@(\\w+\\.\\w+)';
+    flagsEl.value = 'g';
+    testStr.value = 'Contact alice@example.com or bob@company.org for more info.';
+    runRegex();
+  </script>
+</body>
+</html>

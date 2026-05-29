@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timestamp Converter — Unix Timestamp to Date Online | DevBox</title>
+  <meta name="description" content="Free online Unix timestamp converter. Convert timestamps to human-readable dates and vice versa. Supports seconds and milliseconds. Works entirely in your browser.">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="../index.html" class="nav-logo">DevBox</a>
+      <div class="nav-links">
+        <a href="json-formatter.html">JSON</a>
+        <a href="base64.html">Base64</a>
+        <a href="uuid-generator.html">UUID</a>
+        <a href="url-encoder.html">URL</a>
+        <a href="timestamp.html">Timestamp</a>
+        <a href="regex-tester.html">Regex</a>
+        <a href="password-generator.html">Password</a>
+        <a href="markdown-preview.html">Markdown</a>
+        <a href="color-converter.html">Color</a>
+        <a href="diff-checker.html">Diff</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="container">
+      <div class="main-header">
+        <h1 class="page-title">Timestamp Converter</h1>
+        <p class="page-desc">Convert Unix timestamps to human-readable dates and back. Supports both seconds and milliseconds.</p>
+      </div>
+
+      <div class="tool-row" style="margin-bottom:16px;">
+        <div>
+          <label for="ts-input">Unix Timestamp → Date</label>
+          <input type="text" id="ts-input" placeholder="e.g. 1700000000">
+          <div class="btn-group">
+            <button class="btn btn-primary btn-sm" onclick="tsToDate()">Convert</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('ts-input').value=Math.floor(Date.now()/1000);tsToDate();">Use Now</button>
+          </div>
+        </div>
+        <div>
+          <label for="ts-output">Result</label>
+          <div id="ts-output" class="result-area">—</div>
+        </div>
+      </div>
+
+      <hr style="border-color:var(--border);margin:20px 0;">
+
+      <div class="tool-row" style="margin-bottom:16px;">
+        <div>
+          <label for="dt-input">Date → Unix Timestamp</label>
+          <input type="text" id="dt-input" placeholder="e.g. 2024-01-15 08:30:00">
+          <div class="btn-group">
+            <button class="btn btn-primary btn-sm" onclick="dateToTs()">Convert</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('dt-input').value=new Date().toISOString().slice(0,19).replace('T',' ');dateToTs();">Use Now</button>
+          </div>
+        </div>
+        <div>
+          <label for="dt-output">Result</label>
+          <div id="dt-output" class="result-area">—</div>
+        </div>
+      </div>
+
+      <div id="error" class="error-msg" style="display:none"></div>
+
+      <div class="ad-placeholder">AdSense Ad Unit — 728x90 Leaderboard</div>
+
+      <div class="related-tools">
+        <h4>Related Tools</h4>
+        <a href="uuid-generator.html">UUID Generator</a>
+        <a href="base64.html">Base64 Encoder</a>
+        <a href="json-formatter.html">JSON Formatter</a>
+        <a href="regex-tester.html">Regex Tester</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p>DevBox &mdash; All tools run locally in your browser.</p></div></footer>
+
+  <script>
+    const errorEl = document.getElementById('error');
+
+    function tsToDate() {
+      errorEl.style.display = 'none';
+      let ts = document.getElementById('ts-input').value.trim();
+      if (!ts) return;
+      try {
+        let n = parseInt(ts, 10);
+        if (n > 1e15) n = Math.floor(n); // treat as ms
+        else if (n < 1e12) n = n * 1000; // treat as seconds
+        const d = new Date(n);
+        if (isNaN(d.getTime())) throw new Error('Invalid timestamp');
+        const out = document.getElementById('ts-output');
+        out.innerHTML =
+          '<div><span style="color:#888">UTC:</span> ' + d.toUTCString() + '</div>' +
+          '<div style="margin-top:4px;"><span style="color:#888">Local:</span> ' + d.toString() + '</div>' +
+          '<div style="margin-top:4px;"><span style="color:#888">ISO:</span> ' + d.toISOString() + '</div>';
+      } catch(e) { errorEl.style.display = 'block'; errorEl.textContent = 'Error: ' + e.message; }
+    }
+
+    function dateToTs() {
+      errorEl.style.display = 'none';
+      const input = document.getElementById('dt-input').value.trim();
+      if (!input) return;
+      try {
+        const d = new Date(input);
+        if (isNaN(d.getTime())) throw new Error('Invalid date format. Try: 2024-01-15 08:30:00');
+        const sec = Math.floor(d.getTime() / 1000);
+        const out = document.getElementById('dt-output');
+        out.innerHTML =
+          '<div>Seconds: <span style="color:var(--accent)">' + sec + '</span></div>' +
+          '<div style="margin-top:4px;">Milliseconds: <span style="color:var(--accent)">' + (sec * 1000) + '</span></div>';
+
+        // Also populate the ts-input
+        document.getElementById('ts-input').value = sec;
+        tsToDate();
+      } catch(e) { errorEl.style.display = 'block'; errorEl.textContent = 'Error: ' + e.message; }
+    }
+
+    tsToDate();
+  </script>
+</body>
+</html>
